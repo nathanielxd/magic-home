@@ -44,8 +44,6 @@ namespace MagicHome
         public Socket Socket { get; private set; }
         /// <summary> The endpoint of the light </summary>
         public IPEndPoint Ep { get; private set; }
-        /// <summary> The logging functionality of the light </summary>
-        public LightLogger Logger { get; set; }
 
         /// <summary> Specifies whether or not to append checksum to outgoing requests. </summary>
         public bool UseCsum { get; set; }
@@ -60,7 +58,7 @@ namespace MagicHome
         /// <summary> The protocol of the light. </summary>
         public LedProtocol Protocol { get; private set; }
         /// <summary> The color of the light. </summary>
-        public RGB Color { get; private set; }
+        public Color Color { get; private set; }
         /// <summary> The brightness of the light, in percentage. </summary>
         public byte Brightness { get; private set; }
         /// <summary> Specifies whether the light is on or off. </summary>
@@ -82,7 +80,6 @@ namespace MagicHome
             Ep = new IPEndPoint(Ip, PORT);
 
             Directory.CreateDirectory(Assembly.GetExecutingAssembly().Location + "\\.." + "\\Logs");
-            Logger = new LightLogger(this);
 
             UseCsum = true;
             Connect();
@@ -139,8 +136,6 @@ namespace MagicHome
             else
                 SendData(new byte[] { 0xcc, 0x23, 0x33 });
             IsOn = true;
-
-            Log("turned on");
         }
 
         /// <summary> Turns the light off (without disconnecting it). </summary>
@@ -151,8 +146,6 @@ namespace MagicHome
             else
                 SendData(new byte[] { 0xcc, 0x24, 0x33 });
             IsOn = false;
-
-            Log("turned off");
         }
 
         /// <summary> Sets the color of the light in a RGB manner. </summary>
@@ -163,16 +156,14 @@ namespace MagicHome
             else
                 SendData(new byte[] { 0x56, R, G, B, 0xaa });
 
-            RGB placeholder = new RGB(R, G, B);
+            Color placeholder = new Color(R, G, B);
             Color = placeholder;
             UpdateBrightness();
             Mode = LightMode.Color;
-
-            Log("changed colors to " + R + " " + G + " " + B);
         }
 
         // Deprecated
-        public void SetColor(RGB color)
+        public void SetColor(Color color)
         {
             if (Protocol == LedProtocol.LEDENET)
                 SendData(new byte[] { 0x41, color.red, color.green, color.blue, 0x00, 0x00, 0x0f });
@@ -182,8 +173,6 @@ namespace MagicHome
             Color = color;
             Mode = LightMode.Color;
             UpdateBrightness();
-
-            Log("changed colors to " + color.red + " " + color.green + " " + color.blue);
         }
 
         // Check if works
@@ -193,30 +182,24 @@ namespace MagicHome
                 SendData(new byte[] { 0x31, 0, 0, 0, white, 0x0f, 0x0f });
             else
             {
-                Log("Couldn't apply warm white on non-RGBWW lights. Switched to cold white.");
                 SetWhite(white);
             }
 
-            Color = new RGB(white, white, white);
+            Color = new Color(white, white, white);
             Mode = LightMode.White;
             UpdateBrightness();
-
-
-            Log("changed to warm white color: " + white);
-
         }
 
         // Bad stuff
         public void SetWhite(byte white)
         {
             SetColor(white, white, white);
-            Log("changed to white color: " + white);
         }
 
         //Bad stuff
         public void SetBrightness(byte brightness)
         {
-            RGB newColor = new RGB();
+            Color newColor = new Color();
             if (Brightness == 0)
                 TurnOff();
             else
@@ -228,8 +211,6 @@ namespace MagicHome
 
                 SetColor(newColor);
                 Brightness = brightness;
-
-                Log("changed brightness to: " + brightness);
             }
         }
 
@@ -240,8 +221,6 @@ namespace MagicHome
             SendData(new byte[] { 0x61, Convert.ToByte(pattern), delay, 0x0f });
 
             Mode = LightMode.Preset;
-
-            Log("changed to preset pattern: " + pattern.ToString());
         }
 
         /// <summary> 
@@ -250,7 +229,7 @@ namespace MagicHome
         /// Specify the transition type (Gradual, Strobe, Jump) and a speed.
         /// <param name="speed"> How quick the light will cycle through the pattern, in percentage. </param>
         /// </summary>
-        public void SetCustomPattern(RGB[] list, TransitionType transition, byte speed)
+        public void SetCustomPattern(Color[] list, TransitionType transition, byte speed)
         {
             List<byte> byData = new List<byte>();
             bool firstbyte = true;
@@ -277,8 +256,6 @@ namespace MagicHome
             SendData(byDataReady);
 
             Mode = LightMode.Custom;
-
-            Log(" changed to custom pattern.");
         }
 
         /// <summary> Sets the date and time of the light. Leave null for the current system date (DateTime.Now). </summary>
@@ -331,15 +308,15 @@ namespace MagicHome
             Mode = Utilis.DetermineMode(dataHex[3]);
             if (Mode == LightMode.Color)
             {
-                Color = new RGB(dataRaw[6], dataRaw[7], dataRaw[8]);
+                Color = new Color(dataRaw[6], dataRaw[7], dataRaw[8]);
             }
             if(Mode == LightMode.White)
             {
-                Color = new RGB(0, 0, 0);
+                Color = new Color(0, 0, 0);
             }
             if(Mode == LightMode.Preset || Mode == LightMode.Custom)
             {
-                Color = new RGB(0, 0, 0);
+                Color = new Color(0, 0, 0);
             }
 
             Time = GetTime();
@@ -372,7 +349,6 @@ namespace MagicHome
                 catch
                 {
                     GetTime(retries - 1);
-                    Log("Problem retrieving time data");
                 }
             }
             return Time;
@@ -397,8 +373,7 @@ namespace MagicHome
                 }
                 catch (SocketException)
                 {
-                    Log("No protocol detected :(");
-                    throw new Exception("ProtocolException: Could not detect protocol");
+                    throw new Exception("Could not detect protocol.");
                 }
             }
         }
@@ -415,21 +390,7 @@ namespace MagicHome
             if (retries > 0)
             {
                 Socket.Connect(Ep);
-
-                if (Socket.Connected)
-                    Log("connected successfully");
-                else
-                    Log("failed connecting. Retrying...");
             }
-            else
-            {
-                Log("failed connecting. Please ensure the light is on the same network.");
-            }
-        }
-
-        private void Log(string info)
-        {
-            Logger.Log(info);
         }
 
         /// <summary> Sends data to the light. </summary>
@@ -465,10 +426,6 @@ namespace MagicHome
                 catch {
                     ReadData(retries - 1);
                 }
-            }
-            else
-            {
-                Log("Data could not be read. ");
             }
 
             return buffer;

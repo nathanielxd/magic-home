@@ -4,8 +4,10 @@ using System.Text;
 
 namespace MagicHome
 {
+    /// <summary> Different useful methods used in the package. </summary>
     internal static class Utilis
     {
+        /// <summary> Transforms speed (0 to 100) to light specific 'delay' property (0 to 27). </summary>
         internal static byte SpeedToDelay(byte speed)
         {
             if (speed > 100)
@@ -18,12 +20,15 @@ namespace MagicHome
             return delay;
         }
 
+        /// <summary> Determines brightness by red, green and blue values. </summary>
         internal static byte DetermineBrightness(byte Red, byte Green, byte Blue)
         {
             int maxx = 0;
-            if (Red > maxx) { maxx = Red; }
-            if (Green > maxx) { maxx = Green; }
-            if (Blue > maxx) { maxx = Blue; }
+
+            if (Red > maxx) maxx = Red;
+            if (Green > maxx) maxx = Green;
+            if (Blue > maxx) maxx = Blue;
+
             maxx = maxx * 100 / 255;
 
             var brightness = Convert.ToByte(maxx);
@@ -31,6 +36,7 @@ namespace MagicHome
             return brightness;
         }
 
+        /// <summary> Determines the mode of the light according to a code given by the light. </summary>
         internal static LightMode DetermineMode(string patternCode)
         {
             LightMode mode = LightMode.Unknown;
@@ -55,7 +61,8 @@ namespace MagicHome
             return mode;
         }
 
-        public static byte[] ToByteArray(string hexString)
+        /// <summary> Converts a string containing hexadecimals to a byte array. </summary>
+        internal static byte[] ToByteArray(string hexString)
         {
             byte[] bytes = new byte[hexString.Length / 2];
             int indexer;
