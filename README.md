@@ -19,8 +19,8 @@ if(light.Power == false)
 await light.SetColorAsync(0, 255, 0);
 ```
 
-## Documentation
-https://github.com/nathanielxd/magic-home/master/DOCS.md
+## [Documentation](https://github.com/nathanielxd/magic-home/blob/master/DOCS.md)
+Available in the DOCS.md file.
 
 ## Installation
 [NuGet](https://www.nuget.org/packages/MagicHomeAPI/1.4.0)
