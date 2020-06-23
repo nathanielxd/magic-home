@@ -10,5 +10,19 @@
     <RepositoryType />
     <PackageTags>Magic Home, smart lights, magic home light, smart bulb</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.4.0</Version>
+    <PackageReleaseNotes>- Everything is now async (supposedly);
+- Fixed a lot of bugs;
+- Discovering lights now take about 1 second and is more efficient;</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Product>MagicHome</Product>
+    <PackageId>MagicHomeAPI</PackageId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 </Project>
