@@ -19,6 +19,14 @@ if(light.Power == false)
 await light.SetColorAsync(0, 255, 0);
 ```
 
+## Documentation
+https://github.com/nathanielxd/magic-home/master/DOCS.md
+
+## Installation
+[NuGet](https://www.nuget.org/packages/MagicHomeAPI/1.4.0)
+
+.NET CLI `dotnet add package MagicHomeAPI --version 1.4.0`
+
 ### Features
 - Discover bulbs on LAN;
 - Turn On/Off;
@@ -31,12 +39,3 @@ await light.SetColorAsync(0, 255, 0);
 - Music / Microphone;
 - Using in-built-timers;
 - administration to set WiFi SSiD key.
-
-## Installation
-[NuGet](https://www.nuget.org/packages/MagicHomeAPI/1.4.0)
-
-### .NET CLI
-`dotnet add package MagicHomeAPI --version 1.4.0`
-
-## Documentation
-Soon.
