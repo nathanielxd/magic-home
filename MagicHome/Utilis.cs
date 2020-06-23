@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MagicHome
 {
-    /// <summary> Different useful methods used in the package. </summary>
+    /// <summary> Different useful methods used in the library. </summary>
     internal static class Utilis
     {
         /// <summary> Transforms speed (0 to 100) to light specific 'delay' property (0 to 27). </summary>
         internal static byte SpeedToDelay(byte speed)
         {
             if (speed > 100)
-                speed = 100;
+                throw new MagicHomeException("Speed cannot have a value more than 100.");
 
             int inv_speed = 100 - speed;
             byte delay = Convert.ToByte((inv_speed * (0x1f - 1)) / 100);
@@ -20,7 +18,8 @@ namespace MagicHome
             return delay;
         }
 
-        /// <summary> Determines brightness by red, green and blue values. </summary>
+        /// <summary> Determines brightness by red, green and blue color values. </summary>
+        /// <returns> Brightness level from 0 to 100. </returns>
         internal static byte DetermineBrightness(byte Red, byte Green, byte Blue)
         {
             int maxx = 0;
@@ -37,28 +36,37 @@ namespace MagicHome
         }
 
         /// <summary> Determines the mode of the light according to a code given by the light. </summary>
-        internal static LightMode DetermineMode(string patternCode)
+        /// <returns> Mode of the light. </returns>
+        internal static LightMode DetermineMode(string patternCode, string whiteCode)
         {
-            LightMode mode = LightMode.Unknown;
-            if (patternCode == "61" || patternCode == "62" || patternCode == "41")
-                mode = LightMode.Color;
-
-            if (patternCode == "60")
-                mode = LightMode.Custom;
-
-            for (int i = 25; i <= 38; i++)
+            switch (patternCode)
             {
-                if (patternCode == i.ToString())
+                case "60":
+                    return LightMode.Custom;
+                case "41":
+                case "61":
+                case "62":
+                    if (whiteCode == "0")
+                        return LightMode.Color;
+                    else return LightMode.WarmWhite;
+                case "2a":
+                case "2b":
+                case "2c":
+                case "2d":
+                case "2e":
+                case "2f":
+                    return LightMode.Preset;
+            }
+
+            if(int.TryParse(patternCode, out int result))
+            {
+                if(result >= 25 && result <= 38)
                 {
-                    Console.WriteLine(i.ToString());
-                    mode = LightMode.Preset;
-                    break;
+                    return LightMode.Preset;
                 }
             }
-            if (patternCode == "2a" || patternCode == "2b" || patternCode == "2c" || patternCode == "2d" || patternCode == "2e" || patternCode == "2f")
-                mode = LightMode.Preset;
 
-            return mode;
+            return LightMode.Unknown;
         }
 
         /// <summary> Converts a string containing hexadecimals to a byte array. </summary>
