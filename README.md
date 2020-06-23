@@ -39,3 +39,8 @@ Available in the DOCS.md file.
 - Music / Microphone;
 - Using in-built-timers;
 - administration to set WiFi SSiD key.
+
+### Contribute and support
+If you need any help or request, open an issue or leave an email. I will answer immediately. If you randomly get errors, it might be because of the light so I can't help it.
+
+I'm also open to collaboration.
