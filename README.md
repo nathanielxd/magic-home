@@ -30,17 +30,17 @@ Available in the DOCS.md file.
 .NET CLI `dotnet add package MagicHomeAPI --version 1.4.0`
 
 ### Features
-- Discover bulbs on LAN;
-- Turn On/Off;
-- Use Color, White and Warm white;
-- Turn Patterns;
+- Discover lights on LAN;
+- Turn on/off;
+- Use color and warm white;
+- Turn preset and custom patterns;
 - Use time.
 
-### Missing Features:
-
-- Music / Microphone;
-- Using in-built-timers;
-- administration to set WiFi SSiD key.
+### Missing features:
+- Music and microphone;
+- Use built-timers;
+- Other fancy stuff;
+- Administration to set WiFi SSiD key.
 
 ### Contribute and support
 If you need any help or request, open an issue or leave an email. I will answer immediately. If you randomly get errors, it might be because of the light so I can't help it.
