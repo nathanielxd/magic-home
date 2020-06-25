@@ -3,33 +3,32 @@
 ## Discovery
 Use this static method to discover all available magic home lights on your network:
 ```c#
-var lights = await Light.Discover();
+var lights = await Light.DiscoverAsync();
 ```
 This will take approximately 1 second.
 
 If you have many leds you might need more time to discover all of them, therefore you'll have to use the LightDiscovery class and set a custom timeout.
 ```c#
 LightDiscovery.Timeout = 2000;
-
 var lights = await LightDiscovery.Discover();
 ```
 
-`Light.Discover()` and `LightDiscovery.Discover()` are identical.
+`Light.DiscoverAsync()` and `LightDiscovery.DiscoverAsync()` are doing the same thing.
 
 ## Light
 The light entity contains almost all logic of the library.
 
 ### Constructor
-Initialize your light with its local ip address:
+1. Initialize your light with its local ip address:
 ```c#
 var light = new Light("192.168.1.1");
 ```
 
-Connect to it:
+2. Connect to it:
 ```c#
 await light.ConnectAsync();
 ```
-You're ready to use it.
+3. You're now ready to use it.
 
 ### Methods
 These are the methods used to interact with the light.
