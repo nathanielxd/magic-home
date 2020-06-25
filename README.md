@@ -8,13 +8,15 @@ With this, you can control your bulbs that work with the [Magic Home App](https:
 
 ## Quick Example
 ```c#
-var lights = await Light.Discover();
+var lights = await Light.DiscoverAsync();
 
 var light = lights[0];
 await light.ConnectAsync();
 
-if(light.Power == false)
+if (!light.Power)
+{
   await light.TurnOnAsync();
+}
 
 await light.SetColorAsync(0, 255, 0);
 ```
