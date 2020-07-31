@@ -2,6 +2,8 @@
 .NET Library that allows you to control Magic Home enabled lights connected to the same LAN.
 With this, you can control your bulbs and led strips that work with the [Magic Home App](https://play.google.com/store/apps/details?id=com.Zengge.LEDWifiMagicHome).
 
+This library is also available in [Dart.](https://github.com/nathanielxd/magic-home-dart)
+
 ## Requirements
 - A bulb or led strip that works with the Magic Home app;
 - Your device connected to the same network as the light.
