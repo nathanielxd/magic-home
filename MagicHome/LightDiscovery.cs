@@ -22,7 +22,6 @@ namespace MagicHome
         ///<summary>How long will the discovery take in milliseconds.</summary>
         public static int Timeout { get; set; } = 1000;
 
-        private static List<Light> Lights { get; set; } = new List<Light>();
         private static IPEndPoint ep = new IPEndPoint(IPAddress.Any, DISCOVERY_PORT);
         private static UdpClient socket = new UdpClient(DISCOVERY_PORT);
 
@@ -30,31 +29,47 @@ namespace MagicHome
         private const int DISCOVERY_PORT = 48899;
         private const string DISCOVERY_MESSAGE = "HF-A11ASSISTHREAD";
 
-        //This method is fired whenever we receive a response back.
-        private static void Receive(IAsyncResult result)
+        private static async Task<List<Light>> Send()
         {
-            byte[] data = socket.EndReceive(result, ref ep);
-            string message = Encoding.UTF8.GetString(data);
-
-            //Handle discovered address.
-            if (message != DISCOVERY_MESSAGE)
-            {
-                string address = message.Split(',')[0];
-                Lights.Add(new Light(address));
-            }
-
-            //Start receiving data once again.
-            socket.BeginReceive(Receive, new object());
-        }
-
-        private static void Send()
-        {
-            //Start receiving data.
-            socket.BeginReceive(Receive, new object());
+            List<Light> lights = new List<Light>();
 
             //Send discovery message.
             var data = Encoding.UTF8.GetBytes(DISCOVERY_MESSAGE);
-            socket.Send(data, data.Length, "255.255.255.255", DISCOVERY_PORT);
+            await socket.SendAsync(data, data.Length, "255.255.255.255", DISCOVERY_PORT);
+
+            bool keepReceiving = true;
+
+            while (keepReceiving)
+            {
+                using (var timeoutCancellationTokenSource = new CancellationTokenSource())
+                {
+                    var socketReceiveTask = socket.ReceiveAsync();
+                    socketReceiveTask.ConfigureAwait(false);
+
+                    var completedTask = await Task.WhenAny(socketReceiveTask, Task.Delay(Timeout, timeoutCancellationTokenSource.Token));
+
+                    if (completedTask != socketReceiveTask)
+                    {
+                        keepReceiving = false;
+                    }
+                    else
+                    {
+                        timeoutCancellationTokenSource.Cancel();
+                        var payload = await socketReceiveTask;
+
+                        string message = Encoding.UTF8.GetString(payload.Buffer);
+
+                        //Handle discovered address.
+                        if (message != DISCOVERY_MESSAGE)
+                        {
+                            string address = message.Split(',')[0];
+                            lights.Add(new Light(address));
+                        }
+                    }
+                }
+            }
+
+            return lights;
         }
 
         /// <summary>
@@ -64,10 +79,7 @@ namespace MagicHome
         /// <returns>A list of available lights.</returns>
         public static async Task<List<Light>> DiscoverAsync()
         {
-            Lights.Clear();
-            Send();
-            await Task.Delay(Timeout);
-            return Lights;
+            return await Send();
         }
     }
 }

@@ -377,7 +377,7 @@ namespace MagicHome
         }
 
         /// <summary> Sends data to the light. </summary>
-        private Task SendDataAsync(params byte[] _data)
+        private async Task SendDataAsync(params byte[] _data)
         {
             List<byte> data = new List<byte>();
             data.AddRange(_data);
@@ -391,19 +391,16 @@ namespace MagicHome
                 data.Add(csum);
             }
 
-            return Task.Run(() => Socket.Send(data.ToArray()));
+            await Socket.SendAsync(new ArraySegment<byte>(data.ToArray()), SocketFlags.None);
         }
 
         /// <summary> Reads data from the light socket and returns it. </summary>
-        private Task<byte[]> ReadDataAsync()
+        private async Task<byte[]> ReadDataAsync()
         {
-            return Task.Run(() =>
-            {
-                byte[] buffer = new byte[14];
-                int receiver = Socket.Receive(buffer);
+            byte[] buffer = new byte[14];
+            await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), SocketFlags.None);
 
-                return buffer;
-            });
+            return buffer;
         }
 
         public override string ToString() 
