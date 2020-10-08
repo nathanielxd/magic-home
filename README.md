@@ -10,17 +10,24 @@ This library is also available in [Dart.](https://github.com/nathanielxd/magic-h
 
 ## Quick Example
 ```c#
-var lights = await Light.DiscoverAsync();
+var discoveredLights = await Light.DiscoverAsync();
 
-var light = lights[0];
-await light.ConnectAsync();
-
-if (!light.Power)
+if (discoveredLights?.Count > 0)
 {
-  await light.TurnOnAsync();
-}
+  var light = discoveredLights[0];
 
-await light.SetColorAsync(0, 255, 0);
+  //Connect.
+  await light.ConnectAsync();
+
+  //Check if it is ON.
+  if (light.Power == false)
+      await light.TurnOnAsync();
+
+  //Change color to green.
+  await light.SetColorAsync(0, 255, 0);
+
+  //Print to console light's status.
+  Console.WriteLine(light.ToString());
 ```
 
 ## [Documentation](https://github.com/nathanielxd/magic-home/blob/master/DOCS.md)
