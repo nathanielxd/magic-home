@@ -9,19 +9,25 @@ namespace MagicHome.Example
     {
         static async Task Main()
         {
-            //Connect.
-            var light = new Light("192.168.1.2");
-            await light.ConnectAsync();
+            var discoveredLights = await Light.DiscoverAsync();
 
-            //Check if it is ON.
-            if(light.Power == false)
-                await light.TurnOnAsync();
+            if (discoveredLights?.Count > 0)
+            {
+                var light = discoveredLights[0];
 
-            //Change color to green.
-            await light.SetColorAsync(0, 255, 0);
+                //Connect.
+                await light.ConnectAsync();
 
-            //Print to console light's status.
-            Console.WriteLine(light.ToString());
+                //Check if it is ON.
+                if (light.Power == false)
+                    await light.TurnOnAsync();
+
+                //Change color to green.
+                await light.SetColorAsync(0, 255, 0);
+
+                //Print to console light's status.
+                Console.WriteLine(light.ToString());
+            }            
         }
     }
 }
