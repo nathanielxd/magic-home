@@ -46,7 +46,7 @@ namespace MagicHome
                     var socketReceiveTask = socket.ReceiveAsync();
                     socketReceiveTask.ConfigureAwait(false);
 
-                    var completedTask = await Task.WhenAny(socketReceiveTask, Task.Delay(1000, timeoutCancellationTokenSource.Token));
+                    var completedTask = await Task.WhenAny(socketReceiveTask, Task.Delay(Timeout, timeoutCancellationTokenSource.Token));
 
                     if (completedTask != socketReceiveTask)
                     {
