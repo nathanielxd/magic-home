@@ -16,18 +16,19 @@ if (discoveredLights?.Count > 0)
 {
   var light = discoveredLights[0];
 
-  //Connect.
+  // Connect.
   await light.ConnectAsync();
 
-  //Check if it is ON.
+  // Check if it is ON.
   if (light.Power == false)
       await light.TurnOnAsync();
 
-  //Change color to green.
+  // Change color to green.
   await light.SetColorAsync(0, 255, 0);
 
-  //Print to console light's status.
+  // Print to console light's status.
   Console.WriteLine(light.ToString());
+}
 ```
 
 ## [Documentation](https://github.com/nathanielxd/magic-home/blob/master/DOCS.md)
